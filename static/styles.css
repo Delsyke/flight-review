@@ -1,0 +1,43 @@
+td, tr {
+    width: 150px;
+    margin: auto;
+    text-align: center;
+}
+
+
+header, footer {
+    width: 250px;
+    text-align: center;
+    margin: auto;
+}
+
+
+div {
+    width: 250px;
+    margin: auto;
+}
+
+
+p {
+    margin: auto;
+    text-align: center;
+    align-items: center;
+    width: 100%;
+}
+
+
+.reveal-if-active {
+  opacity: 0;
+  max-height: 0;
+  overflow: hidden;
+  transform: scale(0.5);
+  transition: 0.5s;
+
+
+input[type="radio"]:checked ~ & {
+    opacity: 1;
+    max-height: 100px;
+    padding: 10px 20px;
+    transform: scale(1);
+    overflow: visible;
+  }

@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+	<form method="post" action="/">
+		{{ form.csrf_token }}
+
+			Aircraft:
+			{{ form.aircraft(size=30)}}
+		
+
+		<p>
+			{{ form.airfield.label}} (IATA code)
+			{{ form.airfield(size=30)}}
+		</p>
+		<br>
+
+		<p>
+			{{ form.temp.label}} (&deg;C)
+			{{ form.temp(size=30)}}
+		</p>
+		<br>
+
+		<p>
+			{{ form.fuel.label}} (lbs)
+			{{ form.fuel(size=30)}}
+		</p>
+		<br>
+
+		<p>
+			{{ form.children.label}}
+			{{ form.children(size=30)}}
+		</p>
+		<br>
+
+			<div>
+					<input type="radio" name="bgg" id="bgg" value="Standard">
+			    	<label for="bgg">Standard</label>
+			    <div>
+			    	
+			    	<input type="radio" name="bgg" id="bgg" value="Fixed">
+			    	<label for="bgg">Fixed</label>
+			    	
+			    	<div class="reveal-if-active">
+			        	<label for="which-bgg">How much bgg</label>
+			        	<input type="number" id="which-bgg" name="which-bgg" class="require-if-active" data-require-pair="#bgg" value="">
+			    	</div>
+			    </div>
+			 </div>
+
+		<p><input type="submit" value="Calculate"></input></P>
+	</form>
+{% endblock content %}

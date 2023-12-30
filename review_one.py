@@ -3,10 +3,9 @@ from limits import get_limits
 OW = {
 "SLC":27691,
 "SLO":24207,
-"SLK":28380,
+"SLK":28252,
 "SLD":23633
 }
-
 
 departure = input('Airport: ').upper()
 temp = int(input('Temperature: '))
