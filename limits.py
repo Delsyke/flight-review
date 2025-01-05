@@ -8,11 +8,11 @@ def get_limits(aircraft, airport, temp):
     file = aircraft + '.xlsx'
     sheet = airport
     data = pd.read_excel(file, sheet)
-    vals = data[[temp]]
+    vals = data[temp]
 
-    aircraft_limits['WAT'] = vals[temp][0]
-    aircraft_limits['TODA'] = vals[temp][1]
-    aircraft_limits['ASDA'] = vals[temp][2]
+    aircraft_limits['WAT'] = vals[0]
+    aircraft_limits['TODA'] = vals[1]
+    aircraft_limits['ASDA'] = vals[2]
 
     sorted_limits = sorted(aircraft_limits.items(), key=lambda item: item[1])
    

@@ -1,30 +1,29 @@
-td, tr {
-    width: 150px;
-    margin: auto;
+td, tr, header, footer, p {
     text-align: center;
 }
 
-
-header, footer {
-    width: 250px;
-    text-align: center;
-    margin: auto;
-}
-
-
-div {
-    width: 250px;
-    margin: auto;
-}
-
-
-p {
-    margin: auto;
-    text-align: center;
+.container {
+    display: flex;
     align-items: center;
-    width: 100%;
+    justify-content: center;
 }
 
+body {
+    font-family: Verdana, sans-serif, Tahoma, Geneva, Verdana;
+}
+
+main {
+    border: 1px solid darkgrey;
+    border-radius: 5px;
+}
+
+li {
+    list-style-type: none;
+}
+
+td, th, caption {
+    font-size: 23px;
+}
 
 .reveal-if-active {
   opacity: 0;
@@ -32,7 +31,6 @@ p {
   overflow: hidden;
   transform: scale(0.5);
   transition: 0.5s;
-
 
 input[type="radio"]:checked ~ & {
     opacity: 1;

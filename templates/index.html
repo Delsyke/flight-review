@@ -3,51 +3,67 @@
 
 {% block content %}
 	<form method="post" action="/">
-		{{ form.csrf_token }}
 
-			Aircraft:
-			{{ form.aircraft(size=30)}}
+		<div class="container">
+            <fieldset>
+                <div class="mb-3 mt-3">
+                    <label for="aircraft">Aircraft &nbsp</label>
+                    <select id="aircraft" name="aircraft">
+                        <option value="SLD" selected>SLD &nbsp</option>
+                        <option value="SLO">SLO &nbsp</option>
+                        <option value="SLC">SLC &nbsp</option>
+                        <option value="SLK">SLK &nbsp</option>
+                    </select>
+                </div>
+            </fieldset>
+        </div>
 		
+		<div class="container">
+            <fieldset>
+                <div class="mb-3 mt-3">
+                    <input type="text" name="airfield" id="airfield" value="" placeholder="Airfield (IATA Code)" required>
+                </div>
+                    
+                <div class="mb-3 mt-3">
+                    <input type="number" value="" placeholder="Temperature (°C)" required min="14" max="32" name="temp" id="temp" class="form-input">
+                </div>
+                    
+                <div class="mb-3 mt-3">
+                    <input type="number" value="" placeholder="Fuel" required name="fuel" id="fuel" class="form-input">
+                </div>
 
-		<p>
-			{{ form.airfield.label}} (IATA code)
-			{{ form.airfield(size=30)}}
-		</p>
-		<br>
+                <div class="mb-3 mt-3">
+                    <input type="number" value="" placeholder="Children" required name="children" id="children" class="form-input">
+                </div>
+            </fieldset>
+        </div>
+		
+		<div class="container">
+			<fieldset>
+				<div class="mb-3 mt-3">
+                    <ul>
+                        <li>
+                            <input type="radio" name="bgg" id="bgg" value="Standard" checked>
+				    		<label for="bgg">Standard</label>
+                        </li>
+                        <li>
+							<input type="radio" name="bgg" id="bgg" value="Fixed">
+				    		<label for="bgg">Fixed</label>
 
-		<p>
-			{{ form.temp.label}} (&deg;C)
-			{{ form.temp(size=30)}}
-		</p>
-		<br>
+				    		<div class="reveal-if-active">
+							    <!-- <label for="which-bgg">How much bgg</label> -->
+							    <input type="number" id="which-bgg" name="which-bgg" class="require-if-active" data-require-pair="#bgg" value="" placeholder="How much bgg?">
+							</div>
+                        </li>
+                    </ul>
+                </div>
+			</fieldset>
+		</div>
 
-		<p>
-			{{ form.fuel.label}} (lbs)
-			{{ form.fuel(size=30)}}
-		</p>
-		<br>
-
-		<p>
-			{{ form.children.label}}
-			{{ form.children(size=30)}}
-		</p>
-		<br>
-
-			<div>
-					<input type="radio" name="bgg" id="bgg" value="Standard">
-			    	<label for="bgg">Standard</label>
-			    <div>
-			    	
-			    	<input type="radio" name="bgg" id="bgg" value="Fixed">
-			    	<label for="bgg">Fixed</label>
-			    	
-			    	<div class="reveal-if-active">
-			        	<label for="which-bgg">How much bgg</label>
-			        	<input type="number" id="which-bgg" name="which-bgg" class="require-if-active" data-require-pair="#bgg" value="">
-			    	</div>
-			    </div>
-			 </div>
-
-		<p><input type="submit" value="Calculate"></input></P>
+		<div class="container mb-3 mt-3">
+            <input class="btn btn-lg btn-outline-dark" type="submit" value="Review">
+        </div>
 	</form>
+
+
 {% endblock content %}

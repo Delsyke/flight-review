@@ -2,61 +2,58 @@
 
 
 {% block content %}
-	<p>Max loads with <strong>{{children}}CH:</strong></p>
-	<br>
+	<table class="table table-striped table-hover caption-top">
+        <caption>
+            <p>5Y-{{ aircraft }} Loads with <strong>{{ children }}CH</strong><br>
+        </caption>
+        <tbody>
+            <tr>
+                <td>Airport</td>
+                <td>{{ airfield }}</td>
+            </tr>
+            
+            <tr>
+                <td>Temperature</td>
+                <td>{{ temp }}</td>
+            </tr>
+            
+            <tr>
+                <td>Limit</td>
+                <td>
+					{% if  rtow in [36300, 43000] %}
+						{{rtow}} (MTOW)
+					{% else %}
+						{{rtow}} ({{ limited_by }})
+					{% endif %}
+				</td>
+            </tr>
+            
+            <tr>
+                <td>Fuel</td>
+                <td>{{ fuel }}</td>
+            </tr>
+            
+            <tr>
+                <td style="color: red;"><strong>Pax</strong></td>
+                <td style="color: red;"><strong>{{adults + children}}</strong></td>
+            </tr>
 
-	<table>
-		<tr>
-			<td>Aircraft</td>
-			<td>{{aircraft}}</td>
-		</tr>
-		
-		<tr>
-			<td>Departure</td>
-			<td>{{airfield}}</td>
-		</tr>
-		<tr>
-			<td>Temp</td>
-			<td>{{temp}}&deg;C</td>
-		</tr>
-		
-		<tr>
-			<td>Limit</td>
-			<td>
-				{% if  rtow in [36300, 43000] %}
-					{{rtow}} (MTOW)
-				{% else %}
-					{{rtow}} ({{ limited_by }})
-				{% endif %}
-			</td>
-		</tr>
+            <tr>
+				<td>Baggage</td>
+				<td>{{bgg_wt}} lbs</td>
+			</tr>
 
-		<tr>
-			<td>Fuel</td>
-			<td>{{fuel}}</td>
-		</tr>
+			<tr>
+				<td>TOW</td>
+				<td>{{tow}} lbs</td>
+			</tr>
 
-		<tr>
-			<td><strong>Pax</strong></td>
-			<td><strong>{{adults + children}}</strong></td>
-		</tr>
-
-		<tr>
-			<td>Baggage</td>
-			<td>{{bgg_wt}} lbs</td>
-		</tr>
-
-		<tr>
-			<td>TOW</td>
-			<td>{{tow}} lbs</td>
-		</tr>
-
-		<tr>
-			<td>Underload</td>
-			<td>{{underload}} lbs</td>
-		</tr>
-	</table>
-	<br>
-
-	<p><a href="/">Home</a></p>
+			<tr>
+				<td>Underload</td>
+				<td>{{underload}} lbs</td>
+			</tr>
+        </tbody>
+    </table>
+        <br>
+        <p><a href="/"><button type="button" class="btn btn-lg btn-outline-dark form-input form-submit">Home</button></a></p>
 {% endblock content %}
