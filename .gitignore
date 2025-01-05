@@ -2,3 +2,5 @@
 *.pdf
 /__pycache__/
 venv/
+review_all.py
+review_one.py
