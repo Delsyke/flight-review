@@ -12,7 +12,10 @@ def get_limits(aircraft, airport, temp):
         data = pd.read_excel(file, sheet)
         vals = data[temp]
     except ValueError:
-        abort(401, 'Unable to Calculate. Please confirm airfield and temperature inputs')
+        msg = """
+        Unable to calculate. Please confirm airfield input and temperatures
+        """
+        abort(404, 'Unable to Calculate. Please confirm airfield and temperature inputs')
 
     aircraft_limits['WAT'] = vals[0]
     aircraft_limits['TODA'] = vals[1]
