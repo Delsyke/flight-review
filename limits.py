@@ -1,4 +1,5 @@
 import pandas as pd
+from flask import abort
 
 
 def get_limits(aircraft, airport, temp):
@@ -7,8 +8,11 @@ def get_limits(aircraft, airport, temp):
 
     file = aircraft + '.xlsx'
     sheet = airport
-    data = pd.read_excel(file, sheet)
-    vals = data[temp]
+    try:
+        data = pd.read_excel(file, sheet)
+        vals = data[temp]
+    except ValueError:
+        abort(401, 'Unable to Calculate. Please confirm airfield and temperature inputs')
 
     aircraft_limits['WAT'] = vals[0]
     aircraft_limits['TODA'] = vals[1]
