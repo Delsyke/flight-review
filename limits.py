@@ -2,6 +2,13 @@ import pandas as pd
 from flask import abort
 
 
+MALW = {
+"SLC":42000,
+"SLO":34500,
+"SLK":42000,
+"SLD":33900
+}
+
 def get_limits(aircraft, airport, temp):
     """returns the aircraft performance limited weight"""
     aircraft_limits = dict()
@@ -20,27 +27,38 @@ def get_limits(aircraft, airport, temp):
     aircraft_limits['WAT'] = vals[0]
     aircraft_limits['TODA'] = vals[1]
     aircraft_limits['ASDA'] = vals[2]
+    # aircraft_limits['MLW'] = MALW[aircraft]
 
     sorted_limits = sorted(aircraft_limits.items(), key=lambda item: item[1])
    
     limit = sorted_limits[0]
     
-
     return limit
 
 
-def get_loads(aircraft, empty_wt, fuel, bgg, bgg_wt, children, RTOW, TOW):
+def get_loads(aircraft, empty_wt, fuel, trip, bgg, bgg_wt, children, RTOW, TOW):
     """returns the maximum payload as per the performance limitation and operational conditions"""
     
     adults = 0
+    MLW = MALW[aircraft]
+    lw_limit = False
 
     if bgg == 'Fixed':
         while TOW <= RTOW:
             adults += 1
-            TOW += 185
+            TOW += 185  
         else:
             adults -= 1
             TOW -= 185
+
+        LW = TOW - trip
+        if LW > MLW:
+            lw_limit = True
+            while LW > MLW:
+                adults -= 1
+                TOW -= 185
+                LW -= 185
+    
     elif bgg == 'Standard':
         while TOW <= RTOW:
             adults += 1
@@ -50,6 +68,15 @@ def get_loads(aircraft, empty_wt, fuel, bgg, bgg_wt, children, RTOW, TOW):
             adults -= 1
             TOW -= 216
             bgg_wt -= 31
+
+        LW = TOW - trip
+        if LW > MLW:
+            lw_limit = True
+            while LW > MLW:
+                adults -= 1
+                TOW -= 216
+                LW -= 216
+                bgg_wt -= 31
 
 
     TOB = adults + children
@@ -92,4 +119,4 @@ def get_loads(aircraft, empty_wt, fuel, bgg, bgg_wt, children, RTOW, TOW):
                 TOW = empty_wt + fuel + adults*185 + children*75 + bgg_wt - 50
                 underload = RTOW - TOW
 
-    return [adults, bgg_wt, TOW, underload]
+    return [adults, bgg_wt, TOW, LW, underload, lw_limit, MLW]

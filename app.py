@@ -9,6 +9,7 @@ OW = {
 "SLD":23633
 }
 
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your secret key'
 
@@ -29,6 +30,7 @@ def review():
 	airfield = request.form['airfield'].upper()
 	temp = int(request.form['temp'])
 	fuel = int(request.form['fuel'])
+	trip = int(request.form['trip'])
 	children = int(request.form['children'])
 
 	bgg = request.form['bgg']
@@ -40,12 +42,20 @@ def review():
 	if bgg == 'Fixed':
 		bgg_wt = int(which_bgg)
 
+
 	limits = get_limits(aircraft, airfield, temp)
 	RTOW = limits[1]
 	limited_by = limits[0]
 	empty_wt = OW[aircraft]
 	TOW = empty_wt + fuel + children*75 + bgg_wt - 50
-	loads = get_loads(aircraft, empty_wt, fuel, bgg, bgg_wt, children, RTOW, TOW)
+	loads = get_loads(aircraft, empty_wt, fuel, trip, bgg, bgg_wt, children, RTOW, TOW)
+
+	if loads[5]:
+		limited_by = 'LW'
+		RTOW = loads[6]+trip
+		underload = RTOW - loads[2]
+	else:
+		underload = loads[4]
 
 	return render_template('loads.html',
 		aircraft = aircraft,
@@ -53,12 +63,14 @@ def review():
 		temp = temp,
 		rtow = RTOW,
 		fuel=fuel,
+		trip=trip,
 		limited_by = limited_by,
 		children = children,
 		adults = loads[0],
 		bgg_wt = loads[1],
 		tow = loads[2],
-		underload = loads[3]
+		lw = loads[3],
+		underload = underload
 	)
 
 
