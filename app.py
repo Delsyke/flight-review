@@ -57,6 +57,7 @@ def review():
 	else:
 		underload = loads[4]
 
+
 	return render_template('loads.html',
 		aircraft = aircraft,
 		airfield = airfield,
@@ -70,6 +71,7 @@ def review():
 		bgg_wt = loads[1],
 		tow = loads[2],
 		lw = loads[3],
+		landing_fuel = fuel - trip - 50,
 		underload = underload
 	)
 
