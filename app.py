@@ -1,98 +1,86 @@
 from flask import Flask, render_template, request
 from limits import get_limits, get_loads
 
-
-OW = {
-"SLC":27691,
-"SLO":24207,
-"SLK":28110,
-"SLD":23633
-}
-
-
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your secret key'
 
+# Constants
+OW = {
+    "SLC": 27691,
+    "SLO": 24207,
+    "SLK": 28110,
+    "SLD": 23633
+}
+
+CHILD_WEIGHT = 75
+BAGGAGE_UNIT_WEIGHT = 31
+TAXI_FUEL = 50  # Fuel burned during taxi
 
 
 @app.get('/')
 def home():
-	return render_template('index.html')
+    return render_template('index.html')
 
 
 @app.post('/')
 def review():
+    # Extract and clean form data
+    aircraft = request.form['aircraft'].upper()
+    airfield = request.form['airfield'].upper()
+    temp = int(request.form['temp'])
+    fuel = int(request.form['fuel'])
+    trip = int(request.form['trip'])
+    children = int(request.form['children'])
 
-	# for k,v in request.form.items():
-	# 	print(k, v)
+    bgg = request.form['bgg']
+    which_bgg = request.form['which-bgg']
 
-	aircraft = request.form['aircraft'].upper()
-	airfield = request.form['airfield'].upper()
-	temp = int(request.form['temp'])
-	fuel = int(request.form['fuel'])
-	trip = int(request.form['trip'])
-	children = int(request.form['children'])
+    # Calculate baggage weight
+    if bgg == 'Standard':
+        bgg_wt = children * BAGGAGE_UNIT_WEIGHT
+    elif bgg == 'Fixed':
+        bgg_wt = int(which_bgg)
+    else:
+        bgg_wt = 0  # fallback just in case
 
-	bgg = request.form['bgg']
-	which_bgg = request.form['which-bgg']
+    # Lookup performance limits
+    limits = get_limits(aircraft, airfield, temp)
+    limited_by = limits[0]
+    RTOW = limits[1]
 
+    # Calculate initial weights
+    empty_wt = OW[aircraft]
+    TOW = empty_wt + fuel + (children * CHILD_WEIGHT) + bgg_wt - TAXI_FUEL
 
-	if bgg == 'Standard':
-		bgg_wt = children * 31
-	if bgg == 'Fixed':
-		bgg_wt = int(which_bgg)
+    # Get load plan
+    loads = get_loads(aircraft, empty_wt, fuel, trip, bgg, bgg_wt, children, RTOW, TOW)
 
+    # Adjust limited_by label if landing weight constraint is stronger
+    if loads[5]:  # lw_limit flag
+        limited_by = 'LW'
+        RTOW = loads[6] + trip
+        underload = RTOW - loads[2]  # Updated underload
+    else:
+        underload = loads[4]
 
-	limits = get_limits(aircraft, airfield, temp)
-	RTOW = limits[1]
-	limited_by = limits[0]
-	empty_wt = OW[aircraft]
-	TOW = empty_wt + fuel + children*75 + bgg_wt - 50
-	loads = get_loads(aircraft, empty_wt, fuel, trip, bgg, bgg_wt, children, RTOW, TOW)
-
-	if loads[5]:
-		limited_by = 'LW'
-		RTOW = loads[6]+trip
-		underload = RTOW - loads[2]
-	else:
-		underload = loads[4]
-
-
-	return render_template('loads.html',
-		aircraft = aircraft,
-		airfield = airfield,
-		temp = temp,
-		rtow = RTOW,
-		fuel=fuel,
-		trip=trip,
-		limited_by = limited_by,
-		children = children,
-		adults = loads[0],
-		bgg_wt = loads[1],
-		tow = loads[2],
-		lw = loads[3],
-		landing_fuel = fuel - trip - 50,
-		underload = underload
-	)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    # Render output
+    return render_template('loads.html',
+        aircraft=aircraft,
+        airfield=airfield,
+        temp=temp,
+        rtow=RTOW,
+        fuel=fuel,
+        trip=trip,
+        limited_by=limited_by,
+        children=children,
+        adults=loads[0],
+        bgg_wt=loads[1],
+        tow=loads[2],
+        lw=loads[3],
+        landing_fuel=fuel - trip - TAXI_FUEL,
+        underload=underload
+    )
 
 
 if __name__ == '__main__':
-	app.run(debug=True)
+    app.run(debug=True)
