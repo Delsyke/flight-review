@@ -54,14 +54,17 @@ def review():
 
     # Get load plan
     loads = get_loads(aircraft, empty_wt, fuel, trip, bgg, bgg_wt, children, RTOW, TOW)
+    adults, bgg_wt, TOW, LW, underload, lw_limit, MLW, zfw_limit, MZFW, ZFW = loads
 
-    # Adjust limited_by label if landing weight constraint is stronger
-    if loads[5]:  # lw_limit flag
+    # Adjust limitation logic
+    if lw_limit:
         limited_by = 'LW'
-        RTOW = loads[6] + trip
-        underload = RTOW - loads[2]  # Updated underload
-    else:
-        underload = loads[4]
+        RTOW = MLW + trip
+        underload = RTOW - TOW
+    elif zfw_limit:
+        limited_by = 'ZFW'
+        RTOW = MZFW + fuel - TAXI_FUEL
+        underload = RTOW - TOW
 
     # Render output
     return render_template('loads.html',
@@ -71,12 +74,13 @@ def review():
         rtow=RTOW,
         fuel=fuel,
         trip=trip,
+        zfw=ZFW,
         limited_by=limited_by,
         children=children,
-        adults=loads[0],
-        bgg_wt=loads[1],
-        tow=loads[2],
-        lw=loads[3],
+        adults=adults,
+        bgg_wt=bgg_wt,
+        tow=TOW,
+        lw=LW,
         landing_fuel=fuel - trip - TAXI_FUEL,
         underload=underload
     )

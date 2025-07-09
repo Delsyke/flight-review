@@ -8,10 +8,18 @@ MALW = {
     "SLD": 33900
 }
 
+MZFWs = {
+    "SLC": 39500,
+    "SLK": 39500,
+    "SLD": 32000,
+    "SLO": 32000
+}
+
 ADULT_WEIGHT = 185
 CHILD_WEIGHT = 75
 BAGGAGE_UNIT_WEIGHT = 31
 TAXI_FUEL = 50
+
 
 def get_limits(aircraft, airport, temp):
     """Returns the aircraft performance-limited weight."""
@@ -21,14 +29,14 @@ def get_limits(aircraft, airport, temp):
     except ValueError:
         abort(404, 'Unable to Calculate. Please confirm airfield and temperature inputs')
     
-    aircraft_limits = {
+    takeoff_limits = {
         'WAT': vals[0],
         'TODA': vals[1],
         'ASDA': vals[2]
     }
     
     # Return the lowest performance limit
-    return min(aircraft_limits.items(), key=lambda item: item[1])
+    return min(takeoff_limits.items(), key=lambda item: item[1])
 
 
 def calculate_baggage_and_weights(adults, children, bgg_type, bgg_wt):
@@ -54,37 +62,45 @@ def get_loads(aircraft, empty_wt, fuel, trip, bgg, bgg_wt, children, RTOW, TOW):
     adults = 0
     MLW = MALW[aircraft]
     lw_limit = False
+    MZFW = MZFWs[aircraft]
+    zfw_limit = False
+    incr = ADULT_WEIGHT + (BAGGAGE_UNIT_WEIGHT if bgg == 'Standard' else 0)
+
 
     # Increment until hitting RTOW
-    while True:
-        incr = ADULT_WEIGHT + (BAGGAGE_UNIT_WEIGHT if bgg == 'Standard' else 0)
-        if TOW + incr > RTOW:
-            break
+    while TOW + incr <= RTOW:
         adults += 1
         TOW += incr
         if bgg == 'Standard':
             bgg_wt += BAGGAGE_UNIT_WEIGHT
 
     LW = TOW - trip
+    ZFW = TOW - fuel
 
-    # Adjust if landing weight exceeds MLW
-    while LW > MLW:
+    # Adjust if landing weight exceeds MLW or ZFW exceeds MZFW
+    while LW > MLW or ZFW > MZFW:
         decr = ADULT_WEIGHT + (BAGGAGE_UNIT_WEIGHT if bgg == 'Standard' else 0)
         adults -= 1
         TOW -= decr
         LW -= decr
+        ZFW -= decr
         if bgg == 'Standard':
             bgg_wt -= BAGGAGE_UNIT_WEIGHT
 
+
     TOB = adults + children
-    takeoff_underload = RTOW - TOW
-    landing_underload = MLW - LW
-    underload = min(takeoff_underload, landing_underload)
-    if underload == landing_underload:
-        lw_limit = True
+    underloads = {
+        'takeoff': RTOW - TOW,
+        'landing': MLW - LW,
+        'zfw': MZFW - ZFW
+    }
+
+    underload = min(underloads.values())
+    lw_limit = underload == underloads['landing']
+    zfw_limit = underload == underloads['zfw']
 
     # Apply seat limits and recalculate
     adults, bgg_wt, TOW, TOB = limit_passengers(aircraft, adults, children, bgg, empty_wt, fuel, bgg_wt)
     underload = RTOW - TOW
 
-    return [adults, bgg_wt, TOW, LW, underload, lw_limit, MLW]
+    return [adults, bgg_wt, TOW, LW, underload, lw_limit, MLW, zfw_limit, MZFW, ZFW]

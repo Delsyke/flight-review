@@ -4,13 +4,13 @@
 {% block content %}
 	<table class="table table-striped table-hover caption-top mb-1">
         <caption>
-            <p>5Y-{{ aircraft }} with <strong>{{ children }}CH</strong><br>
+            <p><strong>5Y-{{ aircraft }}</strong> with <strong>{{ children }}CH</strong> from <strong>{{airfield}}</strong><br>
         </caption>
         <tbody>
-            <tr>
+<!--             <tr>
                 <td>Airport</td>
                 <td>{{ airfield }}</td>
-            </tr>
+            </tr> -->
             
             <tr>
                 <td>Temperature</td>
@@ -33,8 +33,13 @@
             </tr>
 
             <tr>
-                <td>Limit</td>
-                <td>
+                <td>ZFW</td>
+                <td>{{zfw}} lbs</td>
+            </tr>
+
+            <tr>
+                <td style="color: red;">Limit</td>
+                <td style="color: red;">
 					{% if  rtow in [36300, 43000] %}
 						{{rtow}} (MTOW)
 					{% else %}
@@ -44,8 +49,8 @@
             </tr>
 
             <tr>
-                <td style="color: red;"><strong>Pax</strong></td>
-                <td style="color: red;"><strong>{{adults + children}}</strong></td>
+                <td><strong>Pax</strong></td>
+                <td><strong>{{adults + children}}</strong></td>
             </tr>
 
             <tr>
